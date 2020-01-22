@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/et_editor_title_editor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@android:string/untitled"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:singleLine="true" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:layout_weight="1">
+
+        <github.ryuunoakaihitomi.notepad.widget.EditorEditText
+            android:id="@+id/et_editor_body_editor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:hint="@string/body"
+            android:importantForAutofill="no"
+            android:inputType="textMultiLine" />
+
+    </ScrollView>
+
+</LinearLayout>
