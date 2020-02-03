@@ -5,7 +5,7 @@ import android.util.Log;
 
 import java.lang.reflect.Method;
 
-import github.ryuunoakaihitomi.notepad.util.hook.ReflectionUtils;
+import github.ryuunoakaihitomi.notepad.util.hack.ReflectionUtils;
 
 public class AndroidCompat {
 

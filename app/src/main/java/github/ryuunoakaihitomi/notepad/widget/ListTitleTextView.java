@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 
 import java.util.Arrays;
 
-import github.ryuunoakaihitomi.notepad.util.hook.ReflectionUtils;
+import github.ryuunoakaihitomi.notepad.util.hack.ReflectionUtils;
 
 public class ListTitleTextView extends TextView {
 

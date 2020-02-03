@@ -9,15 +9,18 @@ import android.os.Process;
 import android.util.ArrayMap;
 import android.util.Log;
 
+import androidx.annotation.WorkerThread;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import github.ryuunoakaihitomi.notepad.util.hook.ReflectionUtils;
+import github.ryuunoakaihitomi.notepad.util.hack.ReflectionUtils;
 
 public class OsUtils {
 
@@ -77,8 +80,16 @@ public class OsUtils {
             for (Field f : aerClass.getFields()) {
                 Object obj = ReflectionUtils.fetchField(f, report);
                 if (obj instanceof ApplicationErrorReport.CrashInfo)
-                    for (Field _f : obj.getClass().getFields())
-                        map.put("CrashInfo." + _f.getName(), ReflectionUtils.fetchField(_f, obj));
+                    for (Field _f : obj.getClass().getFields()) {
+                        Object val = ReflectionUtils.fetchField(_f, obj);
+                        /* CrashInfo.stackTrace */
+                        if (val instanceof String) {
+                            String valStr = (String) val;
+                            if (valStr.contains(System.lineSeparator()))
+                                val = valStr.replace("\t", "    ").split(System.lineSeparator());
+                        }
+                        map.put("CrashInfo." + _f.getName(), val);
+                    }
                 map.put(f.getName(), obj);
             }
             JSONObject crashJson = new JSONObject(map);
@@ -86,6 +97,20 @@ public class OsUtils {
         } catch (JSONException e) {
             Log.e(TAG, "getJsonBuildInfo: ", e);
             return null;
+        }
+    }
+
+    @WorkerThread
+    public static void logcatToFile(String path) {
+        Log.d(TAG, "logcatToFile: start");
+        try {
+            // -d              Dump the log and then exit (don't block)
+            // -f <file>, --file=<file>               Log to file. Default is stdout
+            java.lang.Process exec = Runtime.getRuntime().exec(new String[]{"logcat", "-d", "-f", path});
+            int status = exec.waitFor();
+            Log.d(TAG, "logcatToFile: status=" + status);
+        } catch (IOException | InterruptedException e) {
+            Log.e(TAG, "logcatToFile: ", e);
         }
     }
 }

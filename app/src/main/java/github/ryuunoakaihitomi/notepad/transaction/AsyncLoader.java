@@ -115,7 +115,7 @@ public class AsyncLoader extends AsyncTaskLoader<List<Note>> {
                 String title = note.getTitle(), body = note.getBody();
                 String fullPath = Objects.requireNonNull(
                         getContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)).getAbsolutePath() + File.separator +
-                        StringUtils.trimToValidFileName(title + "." + TimeUtils.getNowId() + ".txt");
+                        StringUtils.trimToValidFileName(title + "." + TimeUtils.getReadableNowId() + ".txt");
                 FileUtils.writeTextFile(fullPath,
                         String.format(getContext().getString(R.string.content_copy_template), title, body));
                 Note savePathNote = new Note();

@@ -3,10 +3,9 @@ package github.ryuunoakaihitomi.notepad.data.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.BaseColumns;
 import android.util.Log;
 
-public class DatabaseHelper extends SQLiteOpenHelper implements BaseColumns {
+public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DatabaseHelper";
 
@@ -21,7 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements BaseColumns {
     @Override
     public void onCreate(SQLiteDatabase db) {
         final String createSql = "CREATE TABLE " + DatabaseConstants.TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + DatabaseConstants._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + DatabaseConstants.COLUMN_NAME_TITLE + " TEXT,"
                 + DatabaseConstants.COLUMN_NAME_BODY + " TEXT,"
                 + DatabaseConstants.COLUMN_NAME_UPDATE_TIME + " INTEGER"

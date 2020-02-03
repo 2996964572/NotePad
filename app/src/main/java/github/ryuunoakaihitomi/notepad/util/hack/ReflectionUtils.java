@@ -1,4 +1,4 @@
-package github.ryuunoakaihitomi.notepad.util.hook;
+package github.ryuunoakaihitomi.notepad.util.hack;
 
 import android.os.Build;
 import android.util.Log;

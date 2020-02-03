@@ -13,9 +13,9 @@ import java.util.Objects;
 
 import github.ryuunoakaihitomi.notepad.util.UiUtils;
 
-public class _ActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
+public class MyActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
-    private static final String TAG = "_ALC";
+    private static final String TAG = "MyALC";
 
     private Activity mActivity;
 

@@ -7,7 +7,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.BaseColumns;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,7 @@ import github.ryuunoakaihitomi.notepad.data.bean.Note;
 import github.ryuunoakaihitomi.notepad.data.db.DatabaseConstants;
 
 
-public class NoteDao implements Dao<Note>, BaseColumns {
+public class NoteDao implements Dao<Note> {
 
     private static final String BASE_URI = NoteProvider.SCHEME + NoteProvider.CONTENT_AUTHORITY + "/";
     private static final String DIR_URI = BASE_URI + DatabaseConstants.TABLE_NAME;
@@ -106,7 +105,7 @@ public class NoteDao implements Dao<Note>, BaseColumns {
         List<Note> notes = new ArrayList<>();
         int titleColIdx = cursor.getColumnIndex(DatabaseConstants.COLUMN_NAME_TITLE),
                 bodyColIdx = cursor.getColumnIndex(DatabaseConstants.COLUMN_NAME_BODY),
-                idColIdx = cursor.getColumnIndex(_ID),
+                idColIdx = cursor.getColumnIndex(DatabaseConstants._ID),
                 updateTimeColIdx = cursor.getColumnIndex(DatabaseConstants.COLUMN_NAME_UPDATE_TIME);
         if (cursor.moveToFirst()) {
             do {

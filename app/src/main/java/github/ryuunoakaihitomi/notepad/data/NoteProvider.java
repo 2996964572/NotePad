@@ -6,7 +6,6 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.provider.BaseColumns;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -16,7 +15,7 @@ import github.ryuunoakaihitomi.notepad.BuildConfig;
 import github.ryuunoakaihitomi.notepad.data.db.DatabaseConstants;
 import github.ryuunoakaihitomi.notepad.data.db.DatabaseHelper;
 
-public class NoteProvider extends ContentProvider implements BaseColumns {
+public class NoteProvider extends ContentProvider {
 
     public static final String SCHEME = "content://";
     public static final String TABLE_TAG_FOR_CUSTOM = "custom";
@@ -43,21 +42,22 @@ public class NoteProvider extends ContentProvider implements BaseColumns {
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
-        Cursor cursor = null;
+        Cursor cursor;
         switch (sUriMatcher.match(uri)) {
             case UriMatchCode.NOTE_DIR:
                 cursor = db.query(DatabaseConstants.TABLE_NAME, null, null, null, null, null, null);
                 break;
             case UriMatchCode.NOTE_ITEM:
                 String id = uri.getPathSegments().get(1);
-                final String findByIdSql = "SELECT * FROM " + DatabaseConstants.TABLE_NAME + " WHERE " + _ID + "=?";
+                final String findByIdSql = "SELECT * FROM " + DatabaseConstants.TABLE_NAME + " WHERE " + DatabaseConstants._ID + "=?";
                 cursor = db.rawQuery(findByIdSql, new String[]{id});
                 break;
             case UriMatchCode.CUSTOM:
                 cursor = db.query(DatabaseConstants.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             default:
-                Log.e(TAG, "query: !");
+                Log.e(TAG, "query: unknown Uri: " + uri);
+                throw new UnsupportedOperationException();
         }
         return cursor;
     }
@@ -72,7 +72,7 @@ public class NoteProvider extends ContentProvider implements BaseColumns {
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
         SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
-        Uri ret = null;
+        Uri ret;
         switch (sUriMatcher.match(uri)) {
             case UriMatchCode.NOTE_DIR:
             case UriMatchCode.NOTE_ITEM:
@@ -80,7 +80,7 @@ public class NoteProvider extends ContentProvider implements BaseColumns {
                 ret = Uri.parse(SCHEME + CONTENT_AUTHORITY + "/" + DatabaseConstants.TABLE_NAME + "/" + id);
                 break;
             default:
-                Log.e(TAG, "insert: !");
+                throw new UnsupportedOperationException();
         }
         return ret;
     }
@@ -88,17 +88,12 @@ public class NoteProvider extends ContentProvider implements BaseColumns {
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
         SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
-        int row = 0;
-        switch (sUriMatcher.match(uri)) {
-            case UriMatchCode.NOTE_DIR:
-                Log.w(TAG, "delete: Will not be implemented.");
-                break;
-            case UriMatchCode.NOTE_ITEM:
-                String id = uri.getPathSegments().get(1);
-                row = db.delete(DatabaseConstants.TABLE_NAME, _ID + "=?", new String[]{id});
-                break;
-            default:
-                Log.e(TAG, "delete: !");
+        int row;
+        if (sUriMatcher.match(uri) == UriMatchCode.NOTE_ITEM) {
+            String id = uri.getPathSegments().get(1);
+            row = db.delete(DatabaseConstants.TABLE_NAME, DatabaseConstants._ID + "=?", new String[]{id});
+        } else {
+            throw new UnsupportedOperationException();
         }
         return row;
     }
@@ -106,18 +101,12 @@ public class NoteProvider extends ContentProvider implements BaseColumns {
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
         SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
-        int row = 0;
-        switch (sUriMatcher.match(uri)) {
-            case UriMatchCode.NOTE_DIR:
-                Log.w(TAG, "update: Will not be implemented.");
-                break;
-            case UriMatchCode.NOTE_ITEM:
-                String id = uri.getPathSegments().get(1);
-                row = db.update(DatabaseConstants.TABLE_NAME, values, _ID + "=?", new String[]{id});
-                break;
-            default:
-                Log.e(TAG, "update: !");
-                break;
+        int row;
+        if (sUriMatcher.match(uri) == UriMatchCode.NOTE_ITEM) {
+            String id = uri.getPathSegments().get(1);
+            row = db.update(DatabaseConstants.TABLE_NAME, values, DatabaseConstants._ID + "=?", new String[]{id});
+        } else {
+            throw new UnsupportedOperationException();
         }
         return row;
     }

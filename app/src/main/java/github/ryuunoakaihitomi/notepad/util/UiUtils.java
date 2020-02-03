@@ -23,14 +23,16 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.annotation.UiThread;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collections;
 
-import github.ryuunoakaihitomi.notepad.util.hook.ReflectionUtils;
+import github.ryuunoakaihitomi.notepad.util.hack.ReflectionUtils;
 
+@UiThread
 public class UiUtils {
 
     private static final String TAG = "UiUtils";
@@ -73,7 +75,7 @@ public class UiUtils {
     }
 
     public static void showMessageDialog(Context context, @StringRes int title, @StringRes int msg, @ColorInt int msgColor) {
-        showMessageDialog(context, context.getString(title), context.getString(msg));
+        showMessageDialog(context, title, msg);
         setAlertDialogMessageTextColor(sDialog, msgColor);
     }
 
@@ -82,6 +84,17 @@ public class UiUtils {
         builder.setTitle(title);
         builder.setMessage(msg);
         sDialog = builder.show();
+    }
+
+    /**
+     * 在{@link android.app.Activity}中设置{@link AlertDialog}时必须设置以防止{@code android.view.WindowLeaked}
+     *
+     * @param dialog sDialog
+     * @see github.ryuunoakaihitomi.notepad.ui.MyActivityLifecycleCallbacks
+     */
+    public static void setDialog(@NonNull AlertDialog dialog) {
+        Log.d(TAG, "setDialog: " + dialog);
+        sDialog = dialog;
     }
 
     @Nullable
@@ -104,7 +117,7 @@ public class UiUtils {
     }
 
     @SafeVarargs
-    public static <V extends View> void curtain(boolean visibility, V... view) {
+    public static <V extends View> void curtain(boolean visibility, @NonNull V... view) {
         for (V v : view) v.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
     }
 

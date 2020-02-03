@@ -2,9 +2,9 @@ package github.ryuunoakaihitomi.notepad.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.LoaderManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.graphics.Color;
@@ -25,6 +25,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,7 +35,11 @@ import github.ryuunoakaihitomi.notepad.data.bean.Note;
 import github.ryuunoakaihitomi.notepad.hook.XposedConstants;
 import github.ryuunoakaihitomi.notepad.transaction.AsyncLoader;
 import github.ryuunoakaihitomi.notepad.util.ContentUtils;
+import github.ryuunoakaihitomi.notepad.util.FileUtils;
+import github.ryuunoakaihitomi.notepad.util.Global;
 import github.ryuunoakaihitomi.notepad.util.InternalRes;
+import github.ryuunoakaihitomi.notepad.util.OsUtils;
+import github.ryuunoakaihitomi.notepad.util.TimeUtils;
 import github.ryuunoakaihitomi.notepad.util.UiUtils;
 
 public class MainActivity extends Activity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, View.OnLongClickListener, LoaderManager.LoaderCallbacks<List<Note>> {
@@ -159,13 +164,14 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 break;
             case R.id.item_list_delete_note:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.delete_confirm)
+                AlertDialog delDialog = builder.setTitle(R.string.delete_confirm)
                         .setMessage(String.format(Locale.getDefault(), getString(R.string.delete_confirm_content), positionForShow))
                         .setCancelable(false)
                         .setNegativeButton(android.R.string.no, null)
                         .setPositiveButton(android.R.string.ok, (dialog, which) ->
                                 getLoaderManager().restartLoader(LOADER_ID, AsyncLoader.getArgBundle(AsyncLoader.ActionType.DELETE,
                                         note.getId(), null, null), MainActivity.this)).show();
+                UiUtils.setDialog(delDialog);
                 break;
         }
         return true;
@@ -195,7 +201,33 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     @Override
     public boolean onLongClick(View v) {
         if (v.getId() == R.id.tv_main_empty_view) {
-            throw new RuntimeException("Test crash");
+            AlertDialog debugDialog = new AlertDialog.Builder(this)
+                    .setTitle(R.string.debug_dialog_title)
+                    .setMessage(R.string.debug_dialog_message)
+                    .setPositiveButton(R.string.test_crash, (dialog, which) -> {
+                        throw new RuntimeException("Test Crash");
+                    })
+                    .setNegativeButton(R.string.logcat, (dialog, which) -> {
+                        String name = "env_" + TimeUtils.getNowId();
+                        UiUtils.showToast(getApplicationContext(), name, true);
+                        new Thread(() -> {
+                            String path = getExternalFilesDir(Global.LOG_DIR_NAME) + File.separator + name + ".txt";
+                            OsUtils.logcatToFile(path);
+                        }).start();
+                    })
+                    .setNeutralButton(R.string.export_database, (dialog, which) -> {
+                        String name = Global.EXPORT_DATABASE_DIR_NAME + "_" + TimeUtils.getNowId();
+                        UiUtils.showToast(MainActivity.this, name, true);
+                        new Thread(() -> {
+                            String path = getExternalFilesDir(Global.EXPORT_DATABASE_DIR_NAME) + File.separator + name + ".zip";
+                            String src = getDatabasePath("placeholder").getParent();
+                            FileUtils.compress(src, path);
+                        }).start();
+                    })
+                    .show();
+            debugDialog.getButton(Dialog.BUTTON_NEGATIVE).setAllCaps(false);
+            UiUtils.setDialog(debugDialog);
+            UiUtils.setAlertDialogMessageTextColor(debugDialog, Color.YELLOW);
         }
         return true;
     }

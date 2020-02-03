@@ -25,4 +25,9 @@
     <string name="unlock">解锁</string>
     <string name="xposed_warning_title">Xposed模块功能已启用</string>
     <string name="xposed_description">本应用的Xposed模块功能仅用于自身的开发调试，建议禁用以提升性能</string>
+    <string name="logcat">logcat</string>
+    <string name="test_crash">测试崩溃</string>
+    <string name="debug_dialog_title">调试工具</string>
+    <string name="debug_dialog_message">该界面仅用于调试，非开发调试目的打开时请退出。</string>
+    <string name="export_database">导出数据库</string>
 </resources>

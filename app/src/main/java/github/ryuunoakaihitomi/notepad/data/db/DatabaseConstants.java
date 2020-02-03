@@ -1,6 +1,11 @@
 package github.ryuunoakaihitomi.notepad.data.db;
 
-public class DatabaseConstants {
+import android.provider.BaseColumns;
+
+public class DatabaseConstants implements BaseColumns {
+
+    private DatabaseConstants() {
+    }
 
     public static final String TABLE_NAME = "note";
     public static final String COLUMN_NAME_TITLE = "title";

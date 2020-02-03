@@ -14,16 +14,17 @@ import java.io.File;
 import java.util.Arrays;
 
 import github.ryuunoakaihitomi.notepad.ui.EditorActivity;
-import github.ryuunoakaihitomi.notepad.ui._ActivityLifecycleCallbacks;
+import github.ryuunoakaihitomi.notepad.ui.MyActivityLifecycleCallbacks;
 import github.ryuunoakaihitomi.notepad.util.AndroidCompat;
 import github.ryuunoakaihitomi.notepad.util.FileUtils;
+import github.ryuunoakaihitomi.notepad.util.Global;
 import github.ryuunoakaihitomi.notepad.util.OsUtils;
 import github.ryuunoakaihitomi.notepad.util.UiUtils;
-import github.ryuunoakaihitomi.notepad.util.hook.HookUtils;
+import github.ryuunoakaihitomi.notepad.util.hack.HookUtils;
 
-public class _Application extends Application implements Thread.UncaughtExceptionHandler {
+public class MyApplication extends Application implements Thread.UncaughtExceptionHandler {
 
-    private static final String TAG = "_Application";
+    private static final String TAG = "MyApplication";
 
     private static final int CRASH_FREEZE_DELAY = 1000;
 
@@ -53,7 +54,7 @@ public class _Application extends Application implements Thread.UncaughtExceptio
                     .build());
         }
 
-        registerActivityLifecycleCallbacks(new _ActivityLifecycleCallbacks());
+        registerActivityLifecycleCallbacks(new MyActivityLifecycleCallbacks());
     }
 
     @Override
@@ -86,9 +87,9 @@ public class _Application extends Application implements Thread.UncaughtExceptio
                     "raw stacktrace:" + Log.getStackTraceString(e));
         }
 
-        File crashLogDir = getExternalFilesDir("crash_log");
+        File crashLogDir = getExternalFilesDir(Global.LOG_DIR_NAME);
         if (crashLogDir != null)
-            FileUtils.writeTextFile(crashLogDir.getAbsolutePath() + File.separator + now + ".log", allInfo);
+            FileUtils.writeTextFile(crashLogDir.getAbsolutePath() + File.separator + "crash_" + now + ".log", allInfo);
 
         SystemClock.sleep(CRASH_FREEZE_DELAY);
         Process.killProcess(Process.myPid());

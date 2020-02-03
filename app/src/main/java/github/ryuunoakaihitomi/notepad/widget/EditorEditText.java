@@ -17,7 +17,7 @@ import androidx.annotation.RequiresApi;
 import java.lang.reflect.Method;
 
 import github.ryuunoakaihitomi.notepad.util.MathUtils;
-import github.ryuunoakaihitomi.notepad.util.hook.ReflectionUtils;
+import github.ryuunoakaihitomi.notepad.util.hack.ReflectionUtils;
 
 public class EditorEditText extends EditText implements View.OnFocusChangeListener {
 

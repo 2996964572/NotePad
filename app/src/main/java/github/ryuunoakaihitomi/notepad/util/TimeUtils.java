@@ -11,6 +11,11 @@ public class TimeUtils {
     }
 
     public static String getNowId() {
+        long now = System.currentTimeMillis();
+        return Long.toString(now, Character.MAX_RADIX).toUpperCase();
+    }
+
+    public static String getReadableNowId() {
         @SuppressWarnings("SpellCheckingInspection") final String pattern = "yyyyMMddHHmmss";
         return new SimpleDateFormat(pattern, Locale.getDefault()).format(new Date());
     }

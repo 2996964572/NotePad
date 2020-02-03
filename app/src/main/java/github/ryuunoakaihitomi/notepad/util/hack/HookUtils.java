@@ -1,4 +1,4 @@
-package github.ryuunoakaihitomi.notepad.util.hook;
+package github.ryuunoakaihitomi.notepad.util.hack;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
