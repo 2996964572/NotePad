@@ -11,12 +11,16 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -26,6 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 
@@ -39,6 +44,7 @@ import github.ryuunoakaihitomi.notepad.util.FileUtils;
 import github.ryuunoakaihitomi.notepad.util.Global;
 import github.ryuunoakaihitomi.notepad.util.InternalRes;
 import github.ryuunoakaihitomi.notepad.util.OsUtils;
+import github.ryuunoakaihitomi.notepad.util.StringUtils;
 import github.ryuunoakaihitomi.notepad.util.TimeUtils;
 import github.ryuunoakaihitomi.notepad.util.UiUtils;
 
@@ -132,7 +138,36 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 finish();
                 break;
             case R.id.item_main_help:
-                UiUtils.showMessageDialog(this, R.string.help, R.string.help_content);
+                String helpContent = StringUtils.inputStreamToString(getResources().openRawResource(R.raw.help));
+                if (TextUtils.isEmpty(helpContent)) {
+                    Log.e(TAG, "onOptionsItemSelected: help content for " + OsUtils.getLanguage() + " is not implemented!");
+                    break;
+                }
+                WebView webView = null;
+                try {
+                    webView = new WebView(getApplicationContext());
+                    WebSettings webSettings = webView.getSettings();
+                    webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+                    webSettings.setLoadWithOverviewMode(true);
+                    webSettings.setSupportZoom(false);
+
+                    String mimeType = Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1 ?
+                            StandardCharsets.UTF_8.name() :
+                            null;
+
+                    webView.loadData(helpContent, mimeType, null);
+                } catch (Throwable t) {
+                    //android.util.AndroidRuntimeException: android.webkit.WebViewFactory$MissingWebViewPackageException: Failed to load WebView provider: No WebView installed
+                    Log.e(TAG, "onOptionsItemSelected: WebView", t);
+                }
+                AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                        .setTitle(R.string.help);
+                if (webView != null) builder.setView(webView);
+                else {
+                    Log.w(TAG, "onOptionsItemSelected: setMessage(..) to show help");
+                    builder.setMessage(Html.fromHtml(helpContent));
+                }
+                UiUtils.setDialog(builder.show());
                 break;
             case R.id.item_main_about:
                 UiUtils.showMessageDialog(this, R.string.about, R.string.about_content);

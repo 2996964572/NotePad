@@ -11,6 +11,8 @@ import android.os.Build;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,13 +22,12 @@ import android.widget.Toast;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
+import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.UiThread;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collections;
 
@@ -62,12 +63,8 @@ public class UiUtils {
     }
 
     public static void setOptionalIconsVisibleOnMenu(Menu menu) {
-        if (menu != null) {
-            Method setOptionalIconsVisible = ReflectionUtils.findMethod(menu.getClass(), "setOptionalIconsVisible", Boolean.TYPE);
-            if (setOptionalIconsVisible != null) {
-                ReflectionUtils.invokeMethod(setOptionalIconsVisible, menu, true);
-            }
-        }
+        ReflectionUtils.invokeMethod(
+                ReflectionUtils.findMethod(menu.getClass(), "setOptionalIconsVisible", Boolean.TYPE), menu, true);
     }
 
     public static void showMessageDialog(Context context, @StringRes int title, @StringRes int msg) {
@@ -84,6 +81,17 @@ public class UiUtils {
         builder.setTitle(title);
         builder.setMessage(msg);
         sDialog = builder.show();
+    }
+
+    public static void setWindowTransparency(
+            @NonNull Window w,
+            @FloatRange(from = 0, to = 1, fromInclusive = false, toInclusive = false) float alpha,
+            @FloatRange(from = 0, to = 1) float backgroundDarkness) {
+        WindowManager.LayoutParams lp = w.getAttributes();
+        lp.alpha = alpha;
+        // 只在show()之后生效
+        lp.dimAmount = backgroundDarkness;
+        w.setAttributes(lp);
     }
 
     /**
@@ -104,11 +112,9 @@ public class UiUtils {
 
     public static void hideCloseButtonOnSearchView(SearchView view) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            Field mCloseButton = ReflectionUtils.findField(SearchView.class, "mCloseButton");
-            ImageView mCloseButtonInstance = null;
-            if (mCloseButton != null) {
-                mCloseButtonInstance = (ImageView) ReflectionUtils.fetchField(mCloseButton, view);
-            }
+            ImageView mCloseButtonInstance;
+            mCloseButtonInstance = (ImageView) ReflectionUtils.fetchField(
+                    ReflectionUtils.findField(SearchView.class, "mCloseButton"), view);
             if (mCloseButtonInstance != null) {
                 mCloseButtonInstance.setEnabled(false);
                 mCloseButtonInstance.setImageDrawable(null);
@@ -121,31 +127,21 @@ public class UiUtils {
         for (V v : view) v.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
     }
 
-    @SuppressWarnings("JavaReflectionMemberAccess")
+    @SuppressLint({"DiscouragedPrivateApi", "JavaReflectionMemberAccess", "PrivateApi"})
     public static void defineSystemToast() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             Log.d(TAG, "defineSystemToast");
-            try {
-                @SuppressLint("DiscouragedPrivateApi")
-                Method getServiceMethod = Toast.class.getDeclaredMethod("getService");
-                getServiceMethod.setAccessible(true);
-                final Object iNotificationManagerObj = getServiceMethod.invoke(null);
-                @SuppressLint("PrivateApi")
-                Class iNotificationManagerCls = Class.forName("android.app.INotificationManager");
-                Object iNotificationManagerProxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-                        new Class[]{iNotificationManagerCls}, (proxy, method, args) -> {
-                            if ("enqueueToast".equals(method.getName())) {
-                                Log.d(TAG, "methodName:" + method.getName() + " D:" + args[2]);
-                                args[0] = "android";
-                            }
-                            return method.invoke(iNotificationManagerObj, args);
-                        });
-                Field sServiceField = Toast.class.getDeclaredField("sService");
-                sServiceField.setAccessible(true);
-                sServiceField.set(null, iNotificationManagerProxy);
-            } catch (Exception e) {
-                Log.e(TAG, "defineSystemToast: ", e);
-            }
+            Object notificationService = ReflectionUtils.invokeMethodNullInstance(
+                    ReflectionUtils.findMethod(Toast.class, "getService"));
+            ReflectionUtils.setFieldNullInstance(ReflectionUtils.findField(Toast.class, "sService"),
+                    Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+                            new Class[]{ReflectionUtils.findClass("android.app.INotificationManager")}, (proxy, method, args) -> {
+                                if ("enqueueToast".equals(method.getName())) {
+                                    Log.d(TAG, "enqueueToast: " + "Duration:" + args[2]);
+                                    args[0] = "android";
+                                }
+                                return method.invoke(notificationService, args);
+                            }));
         }
     }
 

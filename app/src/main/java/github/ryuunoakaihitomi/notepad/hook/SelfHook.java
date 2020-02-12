@@ -1,14 +1,17 @@
 package github.ryuunoakaihitomi.notepad.hook;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.graphics.Color;
 import android.util.Log;
 
+import java.util.Objects;
 import java.util.Random;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import github.ryuunoakaihitomi.notepad.BuildConfig;
@@ -27,6 +30,7 @@ class SelfHook implements IXposedHookLoadPackage {
         signalModuleActive();
         colorDialogMsgText();
         printAllClasses();
+        transparentDialogs();
     }
 
     private void signalModuleActive() {
@@ -56,6 +60,18 @@ class SelfHook implements IXposedHookLoadPackage {
                 Class<?> clazz = (Class<?>) param.getResult();
                 final String clazzName = clazz.getName();
                 Log.d(TAG, "printAllClasses: loadClass " + clazzName);
+            }
+        });
+    }
+
+    private void transparentDialogs() {
+        final float alpha = 0.9f, bgDarkAlpha = 0;
+        XposedBridge.hookAllMethods(Dialog.class, "show", new XC_MethodHook() {
+
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                Dialog dialog = (Dialog) param.thisObject;
+                UiUtils.setWindowTransparency(Objects.requireNonNull(dialog.getWindow()), alpha, bgDarkAlpha);
             }
         });
     }

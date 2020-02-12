@@ -14,7 +14,6 @@
     <string name="note_discard_hint">记事已经放弃保存</string>
     <string name="help">帮助</string>
     <string name="note_saved">记事已保存</string>
-    <string name="help_content">通过菜单选项创建记事\n\n在编辑界面返回键退出保存记事\n\n编辑器可以锁定防止误编辑\n\n长按记事列表弹出操作菜单\n\n标题限制140字\n\n当标题和内容有一项为空时，标题会填充当前时间，填写的文本当作内容\n\n搜索是仅搜索包含关键字的标题的记事，当搜索结果为空时再搜索内容</string>
     <string name="clear">清空</string>
     <string name="count_words">统计字数</string>
     <string name="count_words_content">标题：\t%d字，不计空格%d字\n内容：\t%d字，不计空格%d字</string>

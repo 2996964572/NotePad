@@ -120,7 +120,7 @@ public class AsyncLoader extends AsyncTaskLoader<List<Note>> {
                         String.format(getContext().getString(R.string.content_copy_template), title, body));
                 Note savePathNote = new Note();
                 // 将路径通过记事内容返回
-                savePathNote.setBody(fullPath.replace(Environment.getExternalStoragePublicDirectory("").getAbsolutePath(),
+                savePathNote.setBody(fullPath.replaceFirst(Environment.getExternalStoragePublicDirectory("").getAbsolutePath(),
                         InternalRes.getString(InternalRes.R.string.storage_internal)));
                 return Collections.singletonList(savePathNote);
             default:

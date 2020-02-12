@@ -14,8 +14,6 @@ import android.widget.EditText;
 
 import androidx.annotation.RequiresApi;
 
-import java.lang.reflect.Method;
-
 import github.ryuunoakaihitomi.notepad.util.MathUtils;
 import github.ryuunoakaihitomi.notepad.util.hack.ReflectionUtils;
 
@@ -92,10 +90,6 @@ public class EditorEditText extends EditText implements View.OnFocusChangeListen
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private long getPaintNativeInstance() {
-        Method method = ReflectionUtils.findMethod(Paint.class, "getNativeInstance");
-        if (method != null) {
-            return (long) ReflectionUtils.invokeMethod(method, mPaint);
-        }
-        return -1;
+        return (long) ReflectionUtils.invokeMethod(ReflectionUtils.findMethod(Paint.class, "getNativeInstance"), mPaint);
     }
 }

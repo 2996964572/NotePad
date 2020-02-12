@@ -16,6 +16,7 @@ import java.util.Arrays;
 import github.ryuunoakaihitomi.notepad.ui.EditorActivity;
 import github.ryuunoakaihitomi.notepad.ui.MyActivityLifecycleCallbacks;
 import github.ryuunoakaihitomi.notepad.util.AndroidCompat;
+import github.ryuunoakaihitomi.notepad.util.AppUtils;
 import github.ryuunoakaihitomi.notepad.util.FileUtils;
 import github.ryuunoakaihitomi.notepad.util.Global;
 import github.ryuunoakaihitomi.notepad.util.OsUtils;
@@ -62,9 +63,9 @@ public class MyApplication extends Application implements Thread.UncaughtExcepti
         long now = System.currentTimeMillis();
         String buildInfo = OsUtils.getJsonBuildInfo();
         String crashInfo = OsUtils.getJsonCrashReportInfo(BuildConfig.APPLICATION_ID,
-                OsUtils.getCurrentProcessName(this),
+                AppUtils.getCurrentProcessName(this),
                 now,
-                OsUtils.isSystemApp(this),
+                AppUtils.isSystemApp(this),
                 getPackageManager().getInstallerPackageName(BuildConfig.APPLICATION_ID),
                 e);
         String allInfo = t + System.lineSeparator() +

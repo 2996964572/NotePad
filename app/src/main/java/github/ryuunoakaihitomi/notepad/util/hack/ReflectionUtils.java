@@ -7,6 +7,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 @SuppressWarnings("WeakerAccess")
 public class ReflectionUtils {
@@ -23,7 +24,7 @@ public class ReflectionUtils {
     private ReflectionUtils() {
     }
 
-    private static Class<?> findClass(String className) {
+    public static Class<?> findClass(String className) {
         try {
             return Class.forName(className);
         } catch (ClassNotFoundException e) {
@@ -109,6 +110,15 @@ public class ReflectionUtils {
         }
     }
 
+    public static void setFieldNullInstance(Field field, Object value) {
+        Objects.requireNonNull(field);
+        try {
+            field.set(null, value);
+        } catch (IllegalAccessException e) {
+            Log.e(TAG, "setFieldNullInstance: ", e);
+        }
+    }
+
     public static Method findMethodCallerSensitive(Class<?> clazz, String name, Class<?>... paramTypes) {
         Class<?> clsClz = Class.class;
         Method
@@ -123,9 +133,7 @@ public class ReflectionUtils {
         if (method == null) {
             method = (Method) invokeMethod(getMethod, clazz, name, paramTypes);
         }
-        if (method != null) {
-            setAccessible(method);
-        }
+        setAccessible(method);
         return method;
     }
 
@@ -134,7 +142,7 @@ public class ReflectionUtils {
     }
 
     private static void setAccessible(AccessibleObject accessibleObject) {
-        if (!accessibleObject.isAccessible()) {
+        if (accessibleObject != null && !accessibleObject.isAccessible()) {
             Log.i(TAG, "setAccessible: [" + accessibleObject + "] is not accessible");
             accessibleObject.setAccessible(true);
         }

@@ -1,11 +1,7 @@
 package github.ryuunoakaihitomi.notepad.util;
 
-import android.app.ActivityManager;
 import android.app.ApplicationErrorReport;
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
 import android.os.Build;
-import android.os.Process;
 import android.util.ArrayMap;
 import android.util.Log;
 
@@ -16,7 +12,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -48,21 +44,6 @@ public class OsUtils {
             Log.e(TAG, "getJsonBuildInfo: ", e);
             return null;
         }
-    }
-
-    public static String getCurrentProcessName(Context context) {
-        int pid = Process.myPid();
-        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        assert am != null;
-        List<ActivityManager.RunningAppProcessInfo> runningApps = am.getRunningAppProcesses();
-        if (runningApps == null) return null;
-        for (ActivityManager.RunningAppProcessInfo info : runningApps)
-            if (info.pid == pid) return info.processName;
-        return null;
-    }
-
-    public static boolean isSystemApp(Context context) {
-        return (context.getApplicationInfo().flags & ApplicationInfo.FLAG_SYSTEM) > 0;
     }
 
     public static String getJsonCrashReportInfo(String packageName, String processName, long time, boolean systemApp, String installerPackageName, Throwable t) {
@@ -106,11 +87,20 @@ public class OsUtils {
         try {
             // -d              Dump the log and then exit (don't block)
             // -f <file>, --file=<file>               Log to file. Default is stdout
-            java.lang.Process exec = Runtime.getRuntime().exec(new String[]{"logcat", "-d", "-f", path});
+            Process exec = Runtime.getRuntime().exec(new String[]{"logcat", "-d", "-f", path});
             int status = exec.waitFor();
             Log.d(TAG, "logcatToFile: status=" + status);
         } catch (IOException | InterruptedException e) {
             Log.e(TAG, "logcatToFile: ", e);
+        }
+    }
+
+    public static String getLanguage() {
+        Locale locale = Locale.getDefault();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return locale.toLanguageTag();
+        } else {
+            return locale.toString();
         }
     }
 }
