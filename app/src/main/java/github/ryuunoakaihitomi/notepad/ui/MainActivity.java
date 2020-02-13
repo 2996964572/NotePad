@@ -152,7 +152,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                     webSettings.setSupportZoom(false);
 
                     String mimeType = Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1 ?
-                            StandardCharsets.UTF_8.name() :
+                            "text/html; charset=" + StandardCharsets.UTF_8.name() :
                             null;
 
                     webView.loadData(helpContent, mimeType, null);
@@ -164,7 +164,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                         .setTitle(R.string.help);
                 if (webView != null) builder.setView(webView);
                 else {
-                    Log.w(TAG, "onOptionsItemSelected: setMessage(..) to show help");
+                    Log.w(TAG, "onOptionsItemSelected: setMessage(html) to show help");
                     builder.setMessage(Html.fromHtml(helpContent));
                 }
                 UiUtils.setDialog(builder.show());
