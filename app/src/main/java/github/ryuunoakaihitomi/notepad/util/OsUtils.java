@@ -2,6 +2,7 @@ package github.ryuunoakaihitomi.notepad.util;
 
 import android.app.ApplicationErrorReport;
 import android.os.Build;
+import android.system.Os;
 import android.util.ArrayMap;
 import android.util.Log;
 
@@ -12,6 +13,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -87,7 +91,13 @@ public class OsUtils {
         try {
             // -d              Dump the log and then exit (don't block)
             // -f <file>, --file=<file>               Log to file. Default is stdout
-            Process exec = Runtime.getRuntime().exec(new String[]{"logcat", "-d", "-f", path});
+            List<String> cmdList = new ArrayList<>(Arrays.asList("logcat", "-d", "-f", path));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                //  --pid=<pid>     Only prints logs from the given pid.
+                cmdList.add("--pid=" + Os.getpid());
+            String[] command = new String[cmdList.size()];
+            cmdList.toArray(command);
+            Process exec = Runtime.getRuntime().exec(command);
             int status = exec.waitFor();
             Log.d(TAG, "logcatToFile: status=" + status);
         } catch (IOException | InterruptedException e) {
