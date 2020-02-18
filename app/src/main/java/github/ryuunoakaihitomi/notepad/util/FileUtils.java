@@ -54,7 +54,7 @@ public class FileUtils {
 
     private static void compressInternal(File fileToZip, String fileName, ZipOutputStream zos) throws IOException {
         if (fileToZip.isHidden()) {
-            Log.w(TAG, "compressInternal: " + fileToZip.toString() + " is hidden. But it will pack into the zip file.");
+            Log.w(TAG, "compressInternal: " + fileToZip + " is hidden. But it will pack into the zip file.");
         }
         if (fileToZip.isDirectory()) {
             zos.putNextEntry(new ZipEntry(fileName + (fileName.endsWith(File.separator) ? "" : File.separator)));
