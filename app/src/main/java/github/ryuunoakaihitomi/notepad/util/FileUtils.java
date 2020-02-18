@@ -48,13 +48,13 @@ public class FileUtils {
         } finally {
             long srcLen = getSizeOfDir(sourceFile);
             long tgzLen = new File(targetZipPath).length();
-            Log.d(TAG, "compress: end. data compression ratio: [ " + tgzLen + " / " + srcLen + " ] = " + tgzLen * 100 / srcLen + "%");
+            Log.d(TAG, "compress: end. data compression ratio: [ " + tgzLen + " / " + srcLen + " ] = " + MathUtils.percentage(tgzLen, srcLen) + "%");
         }
     }
 
     private static void compressInternal(File fileToZip, String fileName, ZipOutputStream zos) throws IOException {
         if (fileToZip.isHidden()) {
-            return;
+            Log.w(TAG, "compressInternal: " + fileToZip.toString() + " is hidden. But it will pack into the zip file.");
         }
         if (fileToZip.isDirectory()) {
             zos.putNextEntry(new ZipEntry(fileName + (fileName.endsWith(File.separator) ? "" : File.separator)));
