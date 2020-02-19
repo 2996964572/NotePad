@@ -1,7 +1,9 @@
 package github.ryuunoakaihitomi.notepad.util;
 
 import android.app.ApplicationErrorReport;
+import android.content.Context;
 import android.os.Build;
+import android.os.PowerManager;
 import android.system.Os;
 import android.util.ArrayMap;
 import android.util.Log;
@@ -112,5 +114,13 @@ public class OsUtils {
         } else {
             return locale.toString();
         }
+    }
+
+    public static boolean isPowerSaverEnabled(Context context) {
+        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return powerManager != null && powerManager.isPowerSaveMode();
+        }
+        return false;
     }
 }

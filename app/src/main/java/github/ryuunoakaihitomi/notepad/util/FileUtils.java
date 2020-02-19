@@ -1,7 +1,10 @@
 package github.ryuunoakaihitomi.notepad.util;
 
 import android.os.Build;
+import android.util.DebugUtils;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +20,8 @@ import java.util.Objects;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import github.ryuunoakaihitomi.notepad.util.hack.ReflectionUtils;
 
 
 public class FileUtils {
@@ -48,6 +53,9 @@ public class FileUtils {
         } finally {
             long srcLen = getSizeOfDir(sourceFile);
             long tgzLen = new File(targetZipPath).length();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Log.d(TAG, "compress: size = " + Arrays.asList(getSizeString(srcLen), getSizeString(tgzLen)));
+            }
             Log.d(TAG, "compress: end. data compression ratio: [ " + tgzLen + " / " + srcLen + " ] = " + MathUtils.percentage(tgzLen, srcLen) + "%");
         }
     }
@@ -94,5 +102,12 @@ public class FileUtils {
             for (final File child : children)
                 size += getSizeOfDir(child);
         return size;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public static String getSizeString(long size) {
+        return (String) ReflectionUtils.invokeMethodNullInstance(
+                ReflectionUtils.findMethod(DebugUtils.class, "sizeValueToString", long.class, StringBuilder.class),
+                size, null);
     }
 }

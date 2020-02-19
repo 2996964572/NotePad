@@ -9,6 +9,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
+import github.ryuunoakaihitomi.notepad.BuildConfig;
+
 @SuppressWarnings("WeakerAccess")
 public class ReflectionUtils {
 
@@ -143,7 +145,8 @@ public class ReflectionUtils {
 
     private static void setAccessible(AccessibleObject accessibleObject) {
         if (accessibleObject != null && !accessibleObject.isAccessible()) {
-            Log.i(TAG, "setAccessible: [" + accessibleObject + "] is not accessible");
+            if (BuildConfig.DEBUG)
+                Log.i(TAG, "setAccessible: [" + accessibleObject + "] is not accessible");
             accessibleObject.setAccessible(true);
         }
     }

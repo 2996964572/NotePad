@@ -10,11 +10,15 @@ import android.text.Layout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewDebug;
 import android.widget.EditText;
 
 import androidx.annotation.RequiresApi;
 
+import github.ryuunoakaihitomi.notepad.BuildConfig;
+import github.ryuunoakaihitomi.notepad.util.FileUtils;
 import github.ryuunoakaihitomi.notepad.util.MathUtils;
+import github.ryuunoakaihitomi.notepad.util.OsUtils;
 import github.ryuunoakaihitomi.notepad.util.hack.ReflectionUtils;
 
 public class EditorEditText extends EditText implements View.OnFocusChangeListener {
@@ -23,7 +27,7 @@ public class EditorEditText extends EditText implements View.OnFocusChangeListen
 
     private final Rect mRect;
     private final Paint mPaint;
-    private boolean mHasFocus;
+    private boolean mHasFocus, mPowerSaveMode;
 
     public EditorEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -35,6 +39,12 @@ public class EditorEditText extends EditText implements View.OnFocusChangeListen
 
         setOnFocusChangeListener(this);
 
+        // 在省电模式下禁用一部分视觉效果
+        mPowerSaveMode = OsUtils.isPowerSaverEnabled(getContext());
+        if (mPowerSaveMode) {
+            Log.i(TAG, "constructor: Power save mode is enabled. Disable some visual effects.");
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Log.i(TAG, "mPaint.getNativeInstance() " + getPaintNativeInstance());
         }
@@ -42,6 +52,10 @@ public class EditorEditText extends EditText implements View.OnFocusChangeListen
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (mPowerSaveMode) {
+            super.onDraw(canvas);
+            return;
+        }
 
         Rect r = mRect;
         Paint paint = mPaint;
@@ -86,10 +100,30 @@ public class EditorEditText extends EditText implements View.OnFocusChangeListen
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         mHasFocus = hasFocus;
+        mPowerSaveMode = OsUtils.isPowerSaverEnabled(getContext());
+
+        if (BuildConfig.DEBUG) debug(0);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private long getPaintNativeInstance() {
+    @ViewDebug.CapturedViewProperty // method must be public
+    public long getPaintNativeInstance() {
         return (long) ReflectionUtils.invokeMethod(ReflectionUtils.findMethod(Paint.class, "getNativeInstance"), mPaint);
+    }
+
+    @Override
+    public void debug(int depth) {
+        ViewDebug.dumpCapturedView(TAG, this);
+        super.debug(depth);
+    }
+
+    @Override
+    public void setVisibility(int visibility) {
+        if (visibility != View.VISIBLE &&
+                !mPowerSaveMode &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Log.d(TAG, "setVisibility: invisible... size of content is " + FileUtils.getSizeString(getText().toString().getBytes().length));
+        }
+        super.setVisibility(visibility);
     }
 }

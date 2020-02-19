@@ -28,6 +28,7 @@ import github.ryuunoakaihitomi.notepad.data.bean.Note;
 import github.ryuunoakaihitomi.notepad.data.dao.NoteDao;
 import github.ryuunoakaihitomi.notepad.ui.EditorActivity;
 import github.ryuunoakaihitomi.notepad.ui.MainActivity;
+import github.ryuunoakaihitomi.notepad.ui.QuickRecordActivity;
 import github.ryuunoakaihitomi.notepad.util.FileUtils;
 import github.ryuunoakaihitomi.notepad.util.InternalRes;
 import github.ryuunoakaihitomi.notepad.util.StringUtils;
@@ -91,11 +92,17 @@ public class AsyncLoader extends AsyncTaskLoader<List<Note>> {
                 break;
             case ActionType.INSERT:
                 long insertRow = noteDao.insert(note);
-                if (getId() == MainActivity.LOADER_ID) mNoteList = noteDao.findAll();
-                else {
-                    if (note != null) note.setId(insertRow);
-                    Log.v(TAG, "loadInBackground: return note to EditorActivity. From " + action);
-                    return Collections.singletonList(note);
+                switch (getId()) {
+                    case MainActivity.LOADER_ID:
+                        mNoteList = noteDao.findAll();
+                        break;
+                    case EditorActivity.LOADER_ID:
+                        if (note != null) note.setId(insertRow);
+                        Log.v(TAG, "loadInBackground: return note to EditorActivity. From " + action);
+                        return Collections.singletonList(note);
+                    case QuickRecordActivity.LOADER_ID:
+                        Log.d(TAG, "loadInBackground: QuickRecordActivity");
+                        break;
                 }
                 Log.d(TAG, "loadInBackground: insertRow=" + insertRow);
                 break;

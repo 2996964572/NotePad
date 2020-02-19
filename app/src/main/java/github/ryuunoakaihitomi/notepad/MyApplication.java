@@ -81,7 +81,7 @@ public class MyApplication extends Application implements Thread.UncaughtExcepti
                     new String[]{t.toString(), allInfo});
             Log.i(TAG, "uncaughtException: show on editor");
         } else {
-            /* 由于Log类代码在发布时已经被proguard删除掉，所以需要用另外的方法打印日志 */
+            /* 由于Log类代码在发布时已经被proguard删除掉（可选），所以需要用另外的方法打印日志 */
             LogPrinter crashPrinter = new LogPrinter(Log.ERROR, TAG);
             crashPrinter.println(Arrays.asList(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE) + " crashed" + System.lineSeparator() +
                     "crash info:" + allInfo + System.lineSeparator() +
