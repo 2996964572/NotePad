@@ -9,6 +9,10 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import java.util.Arrays;
+import java.util.Objects;
+
+import github.ryuunoakaihitomi.notepad.BuildConfig;
 import github.ryuunoakaihitomi.notepad.util.hack.ReflectionUtils;
 
 public class ListTitleTextView extends TextView {
@@ -31,20 +35,22 @@ public class ListTitleTextView extends TextView {
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         /* 在弹出上下文菜单时仍保持marquee效果 */
         if (!hasWindowFocus && canMarquee()) {
-            Log.d(TAG, "onWindowFocusChanged: focus lost in marquee, see log from ViewDebug.dumpCapturedView() and debug(). hashCode=" + hashCode());
-            ViewDebug.dumpCapturedView(TAG, this);
+            Log.d(TAG, "onWindowFocusChanged: focus lost in marquee. hashes = " + Arrays.asList(hashCode(), Objects.hashCode(getText())));
+            if (BuildConfig.DEBUG) {
+                ViewDebug.dumpCapturedView(TAG, this);
 
-            // doc from View superclass
-            /*
-             * Prints information about this view in the log output, with the tag
-             * {@link #VIEW_LOG_TAG}. Each line in the output is preceded with an
-             * indentation defined by the <code>depth</code>.
-             *
-             * @param depth the indentation level
-             *
-             * @hide
-             */
-            debug(0);
+                // doc from View superclass
+                /*
+                 * Prints information about this view in the log output, with the tag
+                 * {@link #VIEW_LOG_TAG}. Each line in the output is preceded with an
+                 * indentation defined by the <code>depth</code>.
+                 *
+                 * @param depth the indentation level
+                 *
+                 * @hide
+                 */
+                debug(0);
+            }
         }
         super.onWindowFocusChanged(true);
     }

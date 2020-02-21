@@ -31,6 +31,10 @@ public class MyApplication extends Application implements Thread.UncaughtExcepti
 
     @Override
     protected void attachBaseContext(Context base) {
+        // version log printer
+        new LogPrinter(Log.INFO, BuildConfig.APPLICATION_ID)
+                .println("Notepad version = " + Arrays.asList(BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME, BuildConfig.BUILD_TYPE));
+
         HookUtils.removeReflectRestriction(base);
         super.attachBaseContext(base);
     }

@@ -8,11 +8,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StrikethroughSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -22,6 +28,7 @@ import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -198,14 +205,29 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 getLoaderManager().restartLoader(LOADER_ID, bundle, this);
                 break;
             case R.id.item_list_delete_note:
+                final float baseTitleProportion = 0.8f;
+                String baseTitle = note.getTitle();
+                String formattedTitle = String.format(Locale.getDefault(), getString(R.string.delete_confirm_content), positionForShow, baseTitle);
+                int baseTitleIndex = formattedTitle.indexOf(baseTitle);
+                SpannableString decoratedTitle = new SpannableString(formattedTitle);
+                decoratedTitle.setSpan(new RelativeSizeSpan(baseTitleProportion), baseTitleIndex, formattedTitle.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                decoratedTitle.setSpan(new StyleSpan(Typeface.BOLD), baseTitleIndex, formattedTitle.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                decoratedTitle.setSpan(new StrikethroughSpan(), baseTitleIndex, baseTitleIndex + baseTitle.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 AlertDialog delDialog = builder.setTitle(R.string.delete_confirm)
-                        .setMessage(String.format(Locale.getDefault(), getString(R.string.delete_confirm_content), positionForShow))
+                        .setMessage(decoratedTitle)
                         .setCancelable(false)
                         .setNegativeButton(android.R.string.no, null)
                         .setPositiveButton(android.R.string.ok, (dialog, which) ->
                                 getLoaderManager().restartLoader(LOADER_ID, AsyncLoader.getArgBundle(AsyncLoader.ActionType.DELETE,
                                         note.getId(), null, null), MainActivity.this)).show();
+
+                Button okBtn = delDialog.getButton(Dialog.BUTTON_POSITIVE);
+                okBtn.setTextColor(Color.RED);
+                okBtn.setTypeface(null, Typeface.BOLD);
+                okBtn.setBackgroundColor(Color.LTGRAY);
+
                 UiUtils.setDialog(delDialog);
                 break;
         }

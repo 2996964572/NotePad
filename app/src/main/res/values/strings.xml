@@ -8,7 +8,7 @@
     <string name="note_null">记事为空</string>
     <string name="ctx_menu_hint">你选择的是第%d条记事</string>
     <string name="delete_confirm">确认删除</string>
-    <string name="delete_confirm_content">你确实要删除第%d条记事吗？</string>
+    <string name="delete_confirm_content">你确实要删除第%d条记事吗？\n\n%s</string>
     <string name="copy_note_hint">第%d条记事已复制到尾部</string>
     <string name="discard">放弃保存</string>
     <string name="note_discard_hint">记事已经放弃保存</string>
