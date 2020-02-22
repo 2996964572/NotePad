@@ -3,10 +3,6 @@ package github.ryuunoakaihitomi.notepad.util;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ShortcutInfo;
-import android.content.pm.ShortcutManager;
-import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.util.Log;
 import android.view.Menu;
@@ -21,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.ColorInt;
-import androidx.annotation.DrawableRes;
 import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,7 +24,6 @@ import androidx.annotation.StringRes;
 import androidx.annotation.UiThread;
 
 import java.lang.reflect.Proxy;
-import java.util.Collections;
 
 import github.ryuunoakaihitomi.notepad.util.hack.ReflectionUtils;
 
@@ -142,21 +136,6 @@ public class UiUtils {
                                 }
                                 return method.invoke(notificationService, args);
                             }));
-        }
-    }
-
-    public static void createAppShortcut(Context context, @StringRes int title, @DrawableRes int icon, Intent i) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1) {
-            String titleStr = context.getString(title);
-            ShortcutInfo shortcutInfo = new ShortcutInfo.Builder(context, titleStr)
-                    .setShortLabel(titleStr)
-                    .setIcon(Icon.createWithResource(context, icon))
-                    .setIntent(i)
-                    .build();
-            ShortcutManager manager = context.getSystemService(ShortcutManager.class);
-            if (manager != null) {
-                manager.setDynamicShortcuts(Collections.singletonList(shortcutInfo));
-            }
         }
     }
 

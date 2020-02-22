@@ -39,7 +39,7 @@ import github.ryuunoakaihitomi.notepad.widget.EditorEditText;
 
 public class EditorActivity extends Activity implements LoaderManager.LoaderCallbacks<List<Note>> {
 
-    public static final String SHORTCUT_ACTION_CREATE = BuildConfig.APPLICATION_ID + ".CREATE_NOTE_FROM_SHORTCUT";
+    private static final String SHORTCUT_ACTION_CREATE = BuildConfig.APPLICATION_ID + ".CREATE_NOTE_FROM_SHORTCUT";
     public static final int LOADER_ID = 33;
     private static final String TAG = "EditorActivity";
     private static final String

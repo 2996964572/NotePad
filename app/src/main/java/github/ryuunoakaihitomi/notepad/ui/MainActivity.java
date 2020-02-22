@@ -85,9 +85,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
         registerForContextMenu(mListView);
 
-        UiUtils.createAppShortcut(MainActivity.this, R.string.create_note, android.R.drawable.ic_menu_add,
-                new Intent(EditorActivity.SHORTCUT_ACTION_CREATE));
-
         Bundle args = AsyncLoader.getArgBundle(AsyncLoader.ActionType.FIND_ALL, 0, null, null);
         getLoaderManager().initLoader(LOADER_ID, args, this);
 

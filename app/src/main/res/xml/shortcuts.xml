@@ -1,0 +1,10 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <shortcut
+        android:icon="@android:drawable/ic_menu_add"
+        android:shortcutId="create_note"
+        android:shortcutShortLabel="@string/create_note"
+        tools:targetApi="n_mr1">
+        <intent android:action="github.ryuunoakaihitomi.notepad.CREATE_NOTE_FROM_SHORTCUT" />
+    </shortcut>
+</shortcuts>
