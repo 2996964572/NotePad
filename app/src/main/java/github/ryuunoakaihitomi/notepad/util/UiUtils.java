@@ -43,7 +43,7 @@ public class UiUtils {
 
     public static void showToast(@NonNull Context context, String msg, boolean isLong) {
         boolean isMi = AndroidCompat.isMiui();
-        Toast toast = Toast.makeText(context.getApplicationContext(), isMi ? null : msg, isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(context.getApplicationContext(), isMi ? "" : msg, isLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
         if (isMi) toast.setText(msg);
         toast.show();
     }
