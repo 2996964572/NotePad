@@ -118,6 +118,7 @@ public class UiUtils {
 
     @SafeVarargs
     public static <V extends View> void curtain(boolean visibility, @NonNull V... view) {
+        if (view.length == 0) throw new IllegalArgumentException("undefined view");
         for (V v : view) v.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
     }
 

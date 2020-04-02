@@ -3,10 +3,12 @@ package github.ryuunoakaihitomi.notepad.ui;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -17,7 +19,7 @@ import java.util.List;
 import github.ryuunoakaihitomi.notepad.BuildConfig;
 import github.ryuunoakaihitomi.notepad.R;
 import github.ryuunoakaihitomi.notepad.data.bean.Note;
-import github.ryuunoakaihitomi.notepad.transaction.AsyncLoader;
+import github.ryuunoakaihitomi.notepad.transaction.MainTransaction;
 import github.ryuunoakaihitomi.notepad.util.TimeUtils;
 import github.ryuunoakaihitomi.notepad.util.UiUtils;
 
@@ -40,7 +42,11 @@ public class QuickRecordActivity extends Activity implements LoaderManager.Loade
             return;
         }
 
-        if (BuildConfig.APPLICATION_ID.equals(getCallingPackage())) {
+        String callingPkg = getCallingPackage();
+        ComponentName callingAct = getCallingActivity();
+        Log.d(TAG, "onCreate: calling info = " + Arrays.asList(callingPkg, callingAct));
+        if (callingPkg == null /* Calling from help dialog's WebView. */ || callingPkg.equals(BuildConfig.APPLICATION_ID)) {
+            Log.e(TAG, "onCreate: called by myself!");
             UiUtils.showToast(this, R.string.quick_record_internal_warning);
             finish();
             return;
@@ -49,7 +55,12 @@ public class QuickRecordActivity extends Activity implements LoaderManager.Loade
         CharSequence text = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT);
         boolean isReadOnly = intent.getBooleanExtra(Intent.EXTRA_PROCESS_TEXT_READONLY, true);
 
-        if (text == null) return;
+        if (TextUtils.isEmpty(text)) {
+            Log.e(TAG, "onCreate: text from extra of Intent.EXTRA_PROCESS_TEXT is empty!");
+            finish();
+            return;
+        }
+
         Note note = new Note();
         long now = System.currentTimeMillis();
         mTitle = TimeUtils.getLocalFormatText(now);
@@ -58,12 +69,12 @@ public class QuickRecordActivity extends Activity implements LoaderManager.Loade
         note.setBody(text.toString());
 
         Log.d(TAG, "onCreate: now saving... rec info = " + Arrays.asList(text, now, isReadOnly));
-        getLoaderManager().initLoader(LOADER_ID, AsyncLoader.getArgBundle(AsyncLoader.ActionType.INSERT, 0, note, null), this);
+        getLoaderManager().initLoader(LOADER_ID, MainTransaction.getArgBundle(MainTransaction.ActionType.INSERT, 0, note, null), this);
     }
 
     @Override
     public Loader<List<Note>> onCreateLoader(int id, Bundle args) {
-        return new AsyncLoader(this, args);
+        return new MainTransaction(this, args);
     }
 
     @Override

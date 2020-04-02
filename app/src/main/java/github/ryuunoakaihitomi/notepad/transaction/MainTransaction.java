@@ -34,7 +34,7 @@ import github.ryuunoakaihitomi.notepad.util.InternalRes;
 import github.ryuunoakaihitomi.notepad.util.StringUtils;
 import github.ryuunoakaihitomi.notepad.util.TimeUtils;
 
-public class AsyncLoader extends AsyncTaskLoader<List<Note>> {
+public class MainTransaction extends AsyncTaskLoader<List<Note>> {
 
     private static final String TAG = "AsyncLoader";
 
@@ -45,8 +45,9 @@ public class AsyncLoader extends AsyncTaskLoader<List<Note>> {
 
     private List<Note> mNoteList = new ArrayList<>();
     private Bundle mArgs;
+    private volatile long mStartTimeMillis;
 
-    public AsyncLoader(Context context, Bundle args) {
+    public MainTransaction(Context context, Bundle args) {
         super(context);
         mArgs = args;
     }
@@ -63,7 +64,6 @@ public class AsyncLoader extends AsyncTaskLoader<List<Note>> {
     @WorkerThread
     @Override
     public List<Note> loadInBackground() {
-        long start = SystemClock.currentThreadTimeMillis();
         int action = mArgs.getInt(ArgKey.ACTION);
         Log.i(TAG, "loadInBackground: action=" + action + " thread=" + Thread.currentThread());
         long id = mArgs.getLong(ArgKey.ID);
@@ -133,17 +133,18 @@ public class AsyncLoader extends AsyncTaskLoader<List<Note>> {
             default:
                 Log.e(TAG, "loadInBackground: !");
         }
-        Log.i(TAG, "loadInBackground: duration=" + (SystemClock.currentThreadTimeMillis() - start));
         return mNoteList;
     }
 
     @Override
     protected void onStartLoading() {
+        mStartTimeMillis = SystemClock.currentThreadTimeMillis();
         forceLoad();
     }
 
     @Override
     public void deliverResult(List<Note> data) {
+        Log.i(TAG, "deliverResult: duration=" + (SystemClock.currentThreadTimeMillis() - mStartTimeMillis) + "ms");
         super.deliverResult(data);
     }
 

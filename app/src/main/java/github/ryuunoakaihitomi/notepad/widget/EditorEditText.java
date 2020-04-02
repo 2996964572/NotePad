@@ -62,7 +62,7 @@ public class EditorEditText extends EditText implements View.OnFocusChangeListen
         Layout layout = getLayout();
 
         paint.setColor(Color.GRAY);
-        paint.setTextSize(getLineHeight() / 2);
+        paint.setTextSize(getLineHeight() >> 1);
         int count = getLineCount();
         for (int i = 0; i < count; i++) {
             int baseline = getLineBounds(i, r);

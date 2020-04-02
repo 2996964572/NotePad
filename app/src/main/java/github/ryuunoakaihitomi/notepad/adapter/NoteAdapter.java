@@ -68,7 +68,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
         return convertView;
     }
 
-    private class ViewHolder {
+    private static class ViewHolder {
         ListTitleTextView mTitleOverview;
         TextView mBodyOverview, mUpdateTimeOverview;
     }

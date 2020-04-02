@@ -6,8 +6,8 @@ android {
         applicationId "github.ryuunoakaihitomi.notepad"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 7
-        versionName "2.5"
+        versionCode 8
+        versionName "2.6"
     }
     buildTypes {
         release {
@@ -29,6 +29,6 @@ dependencies {
 
 android.applicationVariants.all { variant ->
     variant.outputs.all {
-        outputFileName = "${rootProject.name}(${variant.applicationId})-${variant.versionName}_${variant.buildType.name}.apk"
+        outputFileName = "${rootProject.name}-${variant.versionName}_${variant.buildType.name}.apk"
     }
 }

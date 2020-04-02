@@ -29,7 +29,7 @@ import java.util.Objects;
 import github.ryuunoakaihitomi.notepad.BuildConfig;
 import github.ryuunoakaihitomi.notepad.R;
 import github.ryuunoakaihitomi.notepad.data.bean.Note;
-import github.ryuunoakaihitomi.notepad.transaction.AsyncLoader;
+import github.ryuunoakaihitomi.notepad.transaction.MainTransaction;
 import github.ryuunoakaihitomi.notepad.util.ContentUtils;
 import github.ryuunoakaihitomi.notepad.util.InternalRes;
 import github.ryuunoakaihitomi.notepad.util.StringUtils;
@@ -94,7 +94,7 @@ public class EditorActivity extends Activity implements LoaderManager.LoaderCall
 
         if (mType.equals(ActionType.UPDATE) && mId != 0) {
             Log.i(TAG, "onCreate: change note " + mId);
-            getLoaderManager().initLoader(LOADER_ID, AsyncLoader.getArgBundle(AsyncLoader.ActionType.FIND_BY_ID, mId, null, null), this);
+            getLoaderManager().initLoader(LOADER_ID, MainTransaction.getArgBundle(MainTransaction.ActionType.FIND_BY_ID, mId, null, null), this);
         } else if (mType.equals(ActionType.CREATE) && mExtraContent != null && mExtraContent.length == 2) {
             Log.i(TAG, "onCreate: create note from extra");
             mTitleEditor.setText(mExtraContent[0]);
@@ -260,10 +260,10 @@ public class EditorActivity extends Activity implements LoaderManager.LoaderCall
         switch (mType) {
             case CREATE:
             case SEND:
-                getLoaderManager().initLoader(LOADER_ID, AsyncLoader.getArgBundle(AsyncLoader.ActionType.INSERT, 0, fetchNoteFromEditor(), null), this);
+                getLoaderManager().initLoader(LOADER_ID, MainTransaction.getArgBundle(MainTransaction.ActionType.INSERT, 0, fetchNoteFromEditor(), null), this);
                 break;
             case UPDATE:
-                getLoaderManager().restartLoader(LOADER_ID, AsyncLoader.getArgBundle(AsyncLoader.ActionType.UPDATE, mId, fetchNoteFromEditor(), null), this);
+                getLoaderManager().restartLoader(LOADER_ID, MainTransaction.getArgBundle(MainTransaction.ActionType.UPDATE, mId, fetchNoteFromEditor(), null), this);
                 break;
         }
         UiUtils.showToast(this, R.string.note_saved, true);
@@ -279,7 +279,7 @@ public class EditorActivity extends Activity implements LoaderManager.LoaderCall
 
     @Override
     public Loader<List<Note>> onCreateLoader(int id, Bundle args) {
-        return new AsyncLoader(this, args);
+        return new MainTransaction(this, args);
     }
 
     @Override

@@ -41,11 +41,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 
+import github.ryuunoakaihitomi.notepad.BuildConfig;
 import github.ryuunoakaihitomi.notepad.R;
 import github.ryuunoakaihitomi.notepad.adapter.NoteAdapter;
 import github.ryuunoakaihitomi.notepad.data.bean.Note;
 import github.ryuunoakaihitomi.notepad.hook.XposedConstants;
-import github.ryuunoakaihitomi.notepad.transaction.AsyncLoader;
+import github.ryuunoakaihitomi.notepad.transaction.MainTransaction;
 import github.ryuunoakaihitomi.notepad.util.ContentUtils;
 import github.ryuunoakaihitomi.notepad.util.FileUtils;
 import github.ryuunoakaihitomi.notepad.util.Global;
@@ -85,7 +86,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
         registerForContextMenu(mListView);
 
-        Bundle args = AsyncLoader.getArgBundle(AsyncLoader.ActionType.FIND_ALL, 0, null, null);
+        Bundle args = MainTransaction.getArgBundle(MainTransaction.ActionType.FIND_ALL, 0, null, null);
         getLoaderManager().initLoader(LOADER_ID, args, this);
 
         if (XposedConstants.isModuleActive()) {
@@ -107,7 +108,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                Bundle bundle = AsyncLoader.getArgBundle(AsyncLoader.ActionType.SEARCH, 0, null, newText);
+                Bundle bundle = MainTransaction.getArgBundle(MainTransaction.ActionType.SEARCH, 0, null, newText);
                 getLoaderManager().restartLoader(LOADER_ID, bundle, MainActivity.this);
                 return false;
             }
@@ -174,6 +175,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 UiUtils.setDialog(builder.show());
                 break;
             case R.id.item_main_about:
+                UiUtils.showToast(this, TextUtils.join(System.lineSeparator(),
+                        new String[]{
+                                BuildConfig.VERSION_NAME,
+                                BuildConfig.BUILD_TYPE,
+                                String.valueOf(BuildConfig.VERSION_CODE)
+                        }), true);
                 UiUtils.showMessageDialog(this, R.string.about, R.string.about_content);
                 break;
         }
@@ -192,12 +199,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 break;
             case R.id.item_list_copy_note:
                 note.setUpdateTime(System.currentTimeMillis());
-                bundle = AsyncLoader.getArgBundle(AsyncLoader.ActionType.INSERT, 0, note, null);
+                bundle = MainTransaction.getArgBundle(MainTransaction.ActionType.INSERT, 0, note, null);
                 getLoaderManager().restartLoader(LOADER_ID, bundle, this);
                 UiUtils.showToast(this, String.format(Locale.getDefault(), getString(R.string.copy_note_hint), positionForShow));
                 break;
             case R.id.item_list_export_note:
-                bundle = AsyncLoader.getArgBundle(AsyncLoader.ActionType.EXPORT, 0, note, null);
+                bundle = MainTransaction.getArgBundle(MainTransaction.ActionType.EXPORT, 0, note, null);
                 mExportToken = true;
                 getLoaderManager().restartLoader(LOADER_ID, bundle, this);
                 break;
@@ -217,7 +224,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                         .setCancelable(false)
                         .setNegativeButton(android.R.string.no, null)
                         .setPositiveButton(android.R.string.ok, (dialog, which) ->
-                                getLoaderManager().restartLoader(LOADER_ID, AsyncLoader.getArgBundle(AsyncLoader.ActionType.DELETE,
+                                getLoaderManager().restartLoader(LOADER_ID, MainTransaction.getArgBundle(MainTransaction.ActionType.DELETE,
                                         note.getId(), null, null), MainActivity.this)).show();
 
                 Button okBtn = delDialog.getButton(Dialog.BUTTON_POSITIVE);
@@ -288,7 +295,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     @Override
     public Loader<List<Note>> onCreateLoader(int id, Bundle args) {
-        return new AsyncLoader(this, args);
+        return new MainTransaction(this, args);
     }
 
     @Override
@@ -301,6 +308,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             mExportToken = false;
         } else {
             /* 避开导出返回路径数据 */
+            // 这个地方有点weird，但是目前Note还没有更多的用途，暂时不定义type
             if (data.size() == 1 && data.get(0).getTitle() == null) {
                 Log.d(TAG, "onLoadFinished: data from export file path. don't reload");
                 return;
